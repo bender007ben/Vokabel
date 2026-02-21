@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spark Vocab - Standalone Pro</title>
+    <title>Spark Vocab - Komplett-Edition</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -40,7 +40,7 @@
             Activity: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>,
             Eye: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
             Settings: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
-            Download: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Save: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         };
 
         const App = () => {
@@ -52,9 +52,10 @@
             const [revealedForms, setRevealedForms] = useState({});
             
             const [showNewCatModal, setShowNewCatModal] = useState(false);
+            const [editingCategoryId, setEditingCategoryId] = useState(null);
             const [showRandomChoiceModal, setShowRandomChoiceModal] = useState(false);
             const [showSettingsModal, setShowSettingsModal] = useState(false);
-            const [newCatName, setNewCatName] = useState('');
+            const [catInputName, setCatInputName] = useState('');
 
             const [editingCardId, setEditingCardId] = useState(null);
             const [cardType, setCardType] = useState('standard'); 
@@ -70,23 +71,22 @@
                     setCategories(window.__SPARK_DATA_INJECTION__.categories || []);
                     setCards(window.__SPARK_DATA_INJECTION__.cards || []);
                 } else {
-                    const savedCats = localStorage.getItem('spark_v12_cats');
-                    const savedCards = localStorage.getItem('spark_v12_cards');
+                    const savedCats = localStorage.getItem('spark_v13_cats');
+                    const savedCards = localStorage.getItem('spark_v13_cards');
                     if (savedCats) setCategories(JSON.parse(savedCats));
                     if (savedCards) setCards(JSON.parse(savedCards));
                 }
             }, []);
 
             useEffect(() => {
-                localStorage.setItem('spark_v12_cats', JSON.stringify(categories));
-                localStorage.setItem('spark_v12_cards', JSON.stringify(cards));
+                localStorage.setItem('spark_v13_cats', JSON.stringify(categories));
+                localStorage.setItem('spark_v13_cards', JSON.stringify(cards));
             }, [categories, cards]);
 
-            // --- HTML Export ---
+            // --- Export/Import ---
             const exportAsHTML = () => {
-                const data = { categories, cards };
+                const dataString = JSON.stringify({ categories, cards });
                 const currentHtml = document.documentElement.outerHTML;
-                const dataString = JSON.stringify(data);
                 const placeholder = 'window.__SPARK_DATA_INJECTION__ = null;';
                 const replacement = `window.__SPARK_DATA_INJECTION__ = ${dataString};`;
                 const newHtml = currentHtml.replace(placeholder, replacement);
@@ -103,29 +103,57 @@
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const content = event.target.result;
-                    const match = content.match(/window\.__SPARK_DATA_INJECTION__ = (\{.*?\});/);
+                    const match = event.target.result.match(/window\.__SPARK_DATA_INJECTION__ = (\{.*?\});/);
                     if (match && match[1]) {
                         try {
                             const imported = JSON.parse(match[1]);
-                            if (confirm("Möchtest du die aktuellen Daten durch den Import ersetzen?")) {
+                            if (confirm("Möchtest du die aktuellen Daten überschreiben?")) {
                                 setCategories(imported.categories || []);
                                 setCards(imported.cards || []);
                                 setShowSettingsModal(false);
                             }
-                        } catch (err) { alert("Fehler beim Parsen der Daten."); }
-                    } else { alert("Keine gültigen Daten in der Datei gefunden."); }
+                        } catch (err) { alert("Import fehlgeschlagen."); }
+                    } else { alert("Keine Daten gefunden."); }
                 };
                 reader.readAsText(file);
             };
 
-            // --- Logik ---
-            const addCategory = () => {
-                if (!newCatName.trim()) return;
-                const newCat = { id: Date.now(), name: newCatName.trim() };
-                setCategories(prev => [...prev, newCat]);
-                setNewCatName('');
+            // --- Ordner-Logik ---
+            const openNewCatModal = () => {
+                setEditingCategoryId(null);
+                setCatInputName('');
+                setShowNewCatModal(true);
+            };
+
+            const openEditCatModal = (cat) => {
+                setEditingCategoryId(cat.id);
+                setCatInputName(cat.name);
+                setShowNewCatModal(true);
+            };
+
+            const saveCategory = () => {
+                if (!catInputName.trim()) return;
+                if (editingCategoryId) {
+                    setCategories(prev => prev.map(c => c.id === editingCategoryId ? { ...c, name: catInputName.trim() } : c));
+                } else {
+                    const newCat = { id: Date.now(), name: catInputName.trim() };
+                    setCategories(prev => [...prev, newCat]);
+                }
+                setCatInputName('');
                 setShowNewCatModal(false);
+            };
+
+            const deleteCategory = (catId) => {
+                if (confirm("Diesen Ordner wirklich löschen? Alle darin enthaltenen Karten werden ebenfalls gelöscht.")) {
+                    setCategories(prev => prev.filter(c => c.id !== catId));
+                    setCards(prev => prev.filter(c => c.categoryId !== catId));
+                }
+            };
+
+            // --- Karten-Logik ---
+            const resetCardForm = () => {
+                setFormFront(''); setFormBack(''); setEditingCardId(null); setCardType('standard');
+                setVerbForms({ eu: '', tu: '', elEa: '', noi: '', voi: '', eiEle: '' });
             };
 
             const saveCard = (e) => {
@@ -137,12 +165,7 @@
                     const newCard = { id: Date.now(), categoryId: selectedCategory.id, type: cardType, front: formFront, back: formBack, verbForms: cardType === 'verb' ? {...verbForms} : null, srs: { interval: 0, ease: 2.5, repetitions: 0, nextReview: Date.now() } };
                     setCards(prev => [newCard, ...prev]);
                 }
-                resetForm();
-            };
-
-            const resetForm = () => {
-                setFormFront(''); setFormBack(''); setEditingCardId(null); setCardType('standard');
-                setVerbForms({ eu: '', tu: '', elEa: '', noi: '', voi: '', eiEle: '' });
+                resetCardForm();
             };
 
             const handleRating = (rating) => {
@@ -179,7 +202,7 @@
                     const flip = Math.random() > 0.5;
                     return { ...c, displayFront: flip ? c.back : c.front, displayBack: flip ? c.front : c.back };
                 }).sort(() => Math.random() - 0.5);
-                setStudySession({ queue, index: 0, flipped: false, isRandomMode: true, title: catId ? "Kategorie Zufall" : "Vokabel Zufall", isChanging: false });
+                setStudySession({ queue, index: 0, flipped: false, isRandomMode: true, title: catId ? "Ordner Zufall" : "Alles Zufall", isChanging: false });
                 setRevealedForms({}); setShowRandomChoiceModal(false);
             };
 
@@ -199,7 +222,7 @@
                     <header className="p-4 border-b bg-white flex items-center justify-between sticky top-0 z-30 shadow-sm">
                         <div className="flex items-center gap-3">
                             {activeTab !== 'home' && (
-                                <button onClick={() => { setActiveTab('home'); setSelectedCategory(null); resetForm(); }} className="p-2 -ml-2 text-slate-500"><Icons.ArrowLeft /></button>
+                                <button onClick={() => { setActiveTab('home'); setSelectedCategory(null); resetCardForm(); }} className="p-2 -ml-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors"><Icons.ArrowLeft /></button>
                             )}
                             <h1 className="font-extrabold text-xl tracking-tight text-slate-800">{activeTab === 'home' ? 'Spark Vocab' : (selectedCategory?.name || 'Vorschau')}</h1>
                         </div>
@@ -210,18 +233,28 @@
                         {activeTab === 'home' && (
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button onClick={() => setShowRandomChoiceModal(true)} className="bg-indigo-600 text-white p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"><Icons.Shuffle /><span className="text-[10px] font-black uppercase">Zufall (VOK)</span></button>
-                                    <button onClick={startVerbTraining} className="bg-emerald-600 text-white p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"><Icons.Activity /><span className="text-[10px] font-black uppercase">Verben (RO)</span></button>
+                                    <button onClick={() => setShowRandomChoiceModal(true)} className="bg-indigo-600 text-white p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"><Icons.Shuffle /><span className="text-[10px] font-black uppercase tracking-widest leading-none">Zufall (VOK)</span></button>
+                                    <button onClick={startVerbTraining} className="bg-emerald-600 text-white p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"><Icons.Activity /><span className="text-[10px] font-black uppercase tracking-widest leading-none text-center">Verben (RO)</span></button>
                                 </div>
                                 <div className="flex justify-between items-center px-1 pt-4">
                                     <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">Ordner</h2>
-                                    <button onClick={() => setShowNewCatModal(true)} className="text-indigo-600 font-bold flex items-center gap-1 text-sm"><Icons.Plus /> Neu</button>
+                                    <button onClick={openNewCatModal} className="text-indigo-600 font-bold flex items-center gap-1 text-sm"><Icons.Plus /> Neu</button>
                                 </div>
                                 <div className="grid gap-3 pb-20">
-                                    {(categories || []).map(cat => (
-                                        <div key={cat.id} onClick={() => { setSelectedCategory(cat); setActiveTab('categoryDetail'); }} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer active:bg-slate-100 transition-colors">
-                                            <div className="flex items-center gap-4"><div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><Icons.Folder /></div><div className="font-bold text-slate-800 truncate">{cat.name}</div></div>
-                                            {dueCount(cat.id) > 0 && <span className="bg-orange-500 text-white text-[10px] px-2 py-1 rounded-full font-black">{dueCount(cat.id)}</span>}
+                                    {categories.map(cat => (
+                                        <div key={cat.id} className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-200 transition-all active:bg-slate-50">
+                                            <div onClick={() => { setSelectedCategory(cat); setActiveTab('categoryDetail'); }} className="p-5 flex items-center justify-between cursor-pointer">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><Icons.Folder /></div>
+                                                    <div className="font-bold text-slate-800 truncate pr-10">{cat.name}</div>
+                                                </div>
+                                                {dueCount(cat.id) > 0 && <span className="bg-orange-500 text-white text-[10px] px-2 py-1 rounded-full font-black">{dueCount(cat.id)}</span>}
+                                            </div>
+                                            {/* Folder Actions */}
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={(e) => { e.stopPropagation(); openEditCatModal(cat); }} className="p-2 text-indigo-400 hover:bg-indigo-50 rounded-lg"><Icons.Edit /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); deleteCategory(cat.id); }} className="p-2 text-rose-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg"><Icons.Trash /></button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -231,17 +264,18 @@
                         {activeTab === 'categoryDetail' && selectedCategory && (
                             <div className="space-y-6 pb-20">
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button onClick={() => startCategorySRS(selectedCategory)} className={`py-4 rounded-3xl font-black text-xs shadow-lg flex items-center justify-center gap-2 ${dueCount(selectedCategory.id) > 0 ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-300'}`}><Icons.Book /> {dueCount(selectedCategory.id)} fällig</button>
-                                    <button onClick={() => startRandomVocabTraining(selectedCategory.id)} className="bg-slate-800 text-white py-4 rounded-3xl font-black text-xs shadow-lg flex items-center justify-center gap-2"><Icons.Shuffle /> Zufall (VOK)</button>
+                                    <button onClick={() => startCategorySRS(selectedCategory)} className={`py-4 rounded-3xl font-black text-xs shadow-lg flex items-center justify-center gap-2 ${dueCount(selectedCategory.id) > 0 ? 'bg-indigo-600 text-white shadow-indigo-100' : 'bg-slate-100 text-slate-300'}`}><Icons.Book /> {dueCount(selectedCategory.id)} fällig</button>
+                                    <button onClick={() => startRandomVocabTraining(selectedCategory.id)} className="bg-slate-800 text-white py-4 rounded-3xl font-black text-xs shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95"><Icons.Shuffle /> Zufall (VOK)</button>
                                 </div>
 
                                 <form onSubmit={saveCard} className="bg-white border-2 border-indigo-100 p-5 rounded-3xl space-y-4 shadow-sm">
+                                    <h3 className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">{editingCardId ? 'Bearbeiten' : 'Neue Karte'}</h3>
                                     <div className="flex bg-slate-100 p-1 rounded-xl">
                                         <button type="button" onClick={() => setCardType('standard')} className={`flex-1 py-2 text-[10px] font-black rounded-lg ${cardType === 'standard' ? 'bg-white shadow-sm' : 'text-slate-400'}`}>VOKABEL</button>
                                         <button type="button" onClick={() => setCardType('verb')} className={`flex-1 py-2 text-[10px] font-black rounded-lg ${cardType === 'verb' ? 'bg-white shadow-sm' : 'text-slate-400'}`}>VERB (RO)</button>
                                     </div>
                                     <div className="space-y-3">
-                                        <input className="w-full p-4 rounded-2xl bg-slate-50 outline-none border focus:border-indigo-500" placeholder={cardType === 'verb' ? "Infinitiv" : "Vorderseite"} value={formFront} onChange={e => setFormFront(e.target.value)} />
+                                        <input className="w-full p-4 rounded-2xl bg-slate-50 outline-none border focus:border-indigo-500" placeholder={cardType === 'verb' ? "Infinitiv" : "Frage"} value={formFront} onChange={e => setFormFront(e.target.value)} />
                                         <input className="w-full p-4 rounded-2xl bg-slate-50 outline-none border focus:border-indigo-500" placeholder="Übersetzung" value={formBack} onChange={e => setFormBack(e.target.value)} />
                                         {cardType === 'verb' && (
                                             <div className="grid grid-cols-2 gap-2">
@@ -253,7 +287,7 @@
                                     </div>
                                     <div className="flex gap-2">
                                         <button type="submit" className="flex-[2] bg-slate-800 text-white py-4 rounded-2xl font-bold">{editingCardId ? 'Update' : 'Hinzufügen'}</button>
-                                        {editingCardId && <button type="button" onClick={resetForm} className="flex-1 bg-slate-200 text-slate-600 py-4 rounded-2xl font-bold">X</button>}
+                                        {editingCardId && <button type="button" onClick={resetCardForm} className="flex-1 bg-slate-200 text-slate-600 py-4 rounded-2xl font-bold transition-colors active:bg-slate-300">X</button>}
                                     </div>
                                 </form>
 
@@ -265,8 +299,8 @@
                                                 <div className="text-xs text-slate-400 truncate">{card.back}</div>
                                             </div>
                                             <div className="flex items-center gap-1 opacity-20 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => { setEditingCardId(card.id); setCardType(card.type); setFormFront(card.front); setFormBack(card.back); if(card.type==='verb') setVerbForms(card.verbForms); window.scrollTo({top:0, behavior:'smooth'}); }} className="text-indigo-500 p-2"><Icons.Edit /></button>
-                                                <button onClick={() => { if(confirm("Karte löschen?")) setCards(cards.filter(c => c.id !== card.id)); }} className="text-rose-500 p-2"><Icons.Trash /></button>
+                                                <button onClick={() => { setEditingCardId(card.id); setCardType(card.type); setFormFront(card.front); setFormBack(card.back); if(card.type==='verb') setVerbForms(card.verbForms); window.scrollTo({top:0, behavior:'smooth'}); }} className="text-indigo-500 p-2 rounded-lg hover:bg-indigo-50"><Icons.Edit /></button>
+                                                <button onClick={() => { if(confirm("Karte löschen?")) setCards(cards.filter(c => c.id !== card.id)); }} className="text-rose-500 p-2 rounded-lg hover:bg-rose-50"><Icons.Trash /></button>
                                             </div>
                                         </div>
                                     ))}
@@ -277,20 +311,21 @@
                         {studySession && (
                             <div className="fixed inset-0 bg-slate-50 z-[100] flex flex-col p-6 animate-in fade-in no-select">
                                 <div className="flex justify-between items-center mb-6">
-                                    <button onClick={() => setStudySession(null)} className="text-slate-400 font-bold text-sm">Schließen</button>
+                                    <button onClick={() => setStudySession(null)} className="text-slate-400 font-bold text-sm hover:text-slate-600">Beenden</button>
                                     <div className="text-center"><div className="text-[9px] font-black uppercase text-slate-400 tracking-widest">{studySession.title}</div><div className="text-xs font-bold text-slate-800">{studySession.index + 1} / {studySession.queue.length}</div></div><div className="w-10"></div>
                                 </div>
                                 <div className="flex-1 flex items-center justify-center perspective-1000">
                                     <div className={`relative w-full aspect-[4/5] max-h-[550px] card-inner preserve-3d cursor-pointer ${studySession.flipped ? 'rotate-y-180' : ''}`} onClick={() => !studySession.isChanging && setStudySession({...studySession, flipped: !studySession.flipped})}>
                                         <div className="absolute inset-0 backface-hidden bg-white rounded-[2.5rem] shadow-2xl border flex flex-col items-center justify-center p-10 text-center">
                                             <div className="text-3xl font-black text-slate-800 leading-tight">{studySession.isRandomMode ? studySession.queue[studySession.index].displayFront : studySession.queue[studySession.index].front}</div>
+                                            <div className="absolute bottom-10 text-indigo-400 uppercase tracking-widest text-[9px] font-black animate-pulse">Tippen zum Umdrehen</div>
                                         </div>
                                         <div className="absolute inset-0 backface-hidden rotate-y-180 bg-indigo-600 rounded-[2.5rem] shadow-2xl flex flex-col items-center justify-center p-6 text-center text-white overflow-hidden">
                                             {studySession.flipped && (
                                                 <div className="w-full">
                                                     {studySession.queue[studySession.index].type === 'verb' ? (
                                                         <div className="space-y-4 w-full">
-                                                            <div className="mb-2"><div className="text-2xl font-black mb-1 leading-tight">{studySession.queue[studySession.index].back}</div><div className="text-indigo-200 text-xs font-bold uppercase">{studySession.queue[studySession.index].front}</div></div>
+                                                            <div className="mb-2"><div className="text-2xl font-black mb-1 leading-tight">{studySession.queue[studySession.index].back}</div><div className="text-indigo-200 text-xs font-bold uppercase tracking-widest">{studySession.queue[studySession.index].front}</div></div>
                                                             <div className="bg-indigo-500/40 p-4 rounded-3xl border border-indigo-400/30 space-y-1">
                                                                 {[{l:'eu',k:'eu'},{l:'tu',k:'tu'},{l:'el/ea',k:'elEa'},{l:'noi',k:'noi'},{l:'voi',k:'voi'},{l:'ei/ele',k:'eiEle'}].map((item, idx) => (
                                                                     <div key={idx} onClick={(e) => { e.stopPropagation(); setRevealedForms(prev => ({ ...prev, [idx]: !prev[idx] })); }} className={`flex justify-between items-center py-1.5 px-3 rounded-xl transition-colors cursor-pointer ${revealedForms[idx] ? 'bg-indigo-400/20' : 'hover:bg-white/5'}`}>
@@ -308,9 +343,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`mt-10 grid gap-3 transition-all duration-300 ${studySession.flipped && !studySession.isChanging ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                                <div className={`mt-10 grid gap-3 transition-all duration-300 ${studySession.flipped && !studySession.isChanging ? 'opacity-100' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
                                     {studySession.isRandomMode ? (
-                                        <button onClick={() => handleRating(1)} className="bg-slate-800 text-white py-5 rounded-3xl font-black text-lg shadow-xl active:scale-95">Nächste Karte</button>
+                                        <button onClick={() => handleRating(1)} className="bg-slate-800 text-white py-5 rounded-3xl font-black text-lg shadow-xl active:scale-95 transition-transform">Nächste Karte</button>
                                     ) : (
                                         <div className="grid grid-cols-3 gap-3">
                                             <button onClick={() => handleRating(0)} className="bg-rose-500 text-white py-5 rounded-3xl flex flex-col items-center gap-1 active:scale-90 shadow-lg"><Icons.Shuffle /><span className="text-[10px] font-black uppercase">Nicht</span></button>
@@ -322,16 +357,16 @@
                             </div>
                         )}
 
-                        {/* MODALS (Simplified) */}
+                        {/* MODALS */}
                         {showSettingsModal && (
                             <div className="fixed inset-0 bg-slate-900/60 z-[200] flex items-center justify-center p-6" onClick={() => setShowSettingsModal(false)}>
                                 <div className="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl space-y-6" onClick={e => e.stopPropagation()}>
                                     <h2 className="text-xl font-black text-slate-800">Sicherung</h2>
                                     <div className="space-y-4">
-                                        <button onClick={exportAsHTML} className="w-full flex items-center justify-between p-5 bg-indigo-50 text-indigo-700 rounded-2xl font-bold active:bg-indigo-100">App mit Daten exportieren <Icons.Download /></button>
-                                        <button onClick={() => fileInputRef.current.click()} className="w-full flex items-center justify-between p-5 bg-emerald-50 text-emerald-700 rounded-2xl font-bold active:bg-emerald-100">Daten aus HTML laden <Icons.Plus /></button>
+                                        <button onClick={exportAsHTML} className="w-full flex items-center justify-between p-5 bg-indigo-50 text-indigo-700 rounded-2xl font-bold active:bg-indigo-100 transition-colors">HTML-App exportieren <Icons.Save /></button>
+                                        <button onClick={() => fileInputRef.current.click()} className="w-full flex items-center justify-between p-5 bg-emerald-50 text-emerald-700 rounded-2xl font-bold active:bg-emerald-100 transition-colors">Daten importieren <Icons.Plus /></button>
                                     </div>
-                                    <button onClick={() => setShowSettingsModal(false)} className="w-full text-slate-400 py-2 text-sm font-bold">Abbrechen</button>
+                                    <button onClick={() => setShowSettingsModal(false)} className="w-full text-slate-400 py-2 text-sm font-bold">Schließen</button>
                                 </div>
                             </div>
                         )}
@@ -339,14 +374,15 @@
                         {showRandomChoiceModal && (
                             <div className="fixed inset-0 bg-slate-900/60 z-[200] flex items-end sm:items-center justify-center p-4" onClick={() => setShowRandomChoiceModal(false)}>
                                 <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
-                                    <h2 className="text-lg font-black text-slate-800">Zufall</h2>
-                                    <button onClick={() => startRandomVocabTraining()} className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black">Alles mischen</button>
-                                    <div className="max-h-60 overflow-y-auto space-y-2">
+                                    <h2 className="text-lg font-black text-slate-800">Zufallstraining</h2>
+                                    <button onClick={() => startRandomVocabTraining()} className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black transition-transform active:scale-95">Alle Ordner mischen</button>
+                                    <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                                        <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest px-1">Ordner wählen</p>
                                         {categories.map(cat => (
-                                            <button key={cat.id} onClick={() => startRandomVocabTraining(cat.id)} className="w-full bg-slate-100 text-slate-700 py-3 px-4 rounded-xl text-left font-bold text-sm truncate">{cat.name}</button>
+                                            <button key={cat.id} onClick={() => startRandomVocabTraining(cat.id)} className="w-full bg-slate-100 text-slate-700 py-3 px-4 rounded-xl text-left font-bold text-sm truncate hover:bg-slate-200 transition-colors">{cat.name}</button>
                                         ))}
                                     </div>
-                                    <button onClick={() => setShowRandomChoiceModal(false)} className="w-full text-slate-400 py-2 text-sm font-bold">Abbrechen</button>
+                                    <button onClick={() => setShowRandomChoiceModal(false)} className="w-full text-slate-400 py-2 text-sm font-bold uppercase tracking-widest">Abbrechen</button>
                                 </div>
                             </div>
                         )}
@@ -354,11 +390,11 @@
                         {showNewCatModal && (
                             <div className="fixed inset-0 bg-slate-900/60 z-[200] flex items-center justify-center p-6" onClick={() => setShowNewCatModal(false)}>
                                 <div className="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl space-y-6" onClick={e => e.stopPropagation()}>
-                                    <h2 className="text-xl font-black text-slate-800">Ordner erstellen</h2>
-                                    <input autoFocus className="w-full p-4 rounded-2xl bg-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 font-bold" placeholder="Name..." value={newCatName} onChange={e => setNewCatName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCategory()} />
+                                    <h2 className="text-xl font-black text-slate-800">{editingCategoryId ? 'Ordner umbenennen' : 'Neuer Ordner'}</h2>
+                                    <input autoFocus className="w-full p-4 rounded-2xl bg-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 font-bold" placeholder="Name..." value={catInputName} onChange={e => setCatInputName(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveCategory()} />
                                     <div className="flex gap-3">
-                                        <button onClick={addCategory} className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold">Erstellen</button>
-                                        <button onClick={() => setShowNewCatModal(false)} className="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold">Abbrechen</button>
+                                        <button onClick={saveCategory} className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg transition-transform active:scale-95">{editingCategoryId ? 'Update' : 'Erstellen'}</button>
+                                        <button onClick={() => setShowNewCatModal(false)} className="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold">X</button>
                                     </div>
                                 </div>
                             </div>
